@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WhatsApp directo</title>
+<style>
+  :root {
+    --bg: #eef3ee;
+    --surface: #ffffff;
+    --text: #12201a;
+    --muted: #5b6b63;
+    --line: #cfdad2;
+    --accent: #128c4a;
+    --accent-text: #ffffff;
+    --error: #b3261e;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1713;
+      --surface: #18231d;
+      --text: #e8f1ec;
+      --muted: #94a69c;
+      --line: #2c3d34;
+      --accent: #3ddc84;
+      --accent-text: #08210f;
+      --error: #ff8a80;
+      color-scheme: dark;
+    }
+  }
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; font-weight: 650; }
+  p.hint { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+  label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--muted); }
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 20px;
+    padding: 14px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  input:focus { outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .error { min-height: 20px; margin: 8px 0 12px; color: var(--error); font-size: 14px; }
+  button {
+    width: 100%;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 14px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--accent-text);
+    cursor: pointer;
+  }
+  button:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  .preview { margin-top: 14px; font-size: 13px; color: var(--muted); word-break: break-all; min-height: 18px; }
+</style>
+</head>
+<body>
+  <main class="card" role="dialog" aria-modal="true" aria-labelledby="titulo">
+    <h1 id="titulo">Abrir chat de WhatsApp</h1>
+    <p class="hint">Ingresá el número con código de país, sin agendarlo como contacto.</p>
+    <label for="tel">Número de teléfono</label>
+    <input id="tel" type="tel" inputmode="tel" autocomplete="off" placeholder="5493416083578" autofocus>
+    <div class="error" id="err" role="alert"></div>
+    <button id="ok" type="button">Abrir chat</button>
+    <div class="preview" id="prev"></div>
+  </main>
+
+<script>
+  var BASE = "https://api.whatsapp.com/send?phone=";
+  var tel = document.getElementById("tel");
+  var err = document.getElementById("err");
+  var prev = document.getElementById("prev");
+
+  function limpiar(v) { return v.replace(/\D/g, ""); }
+
+  tel.addEventListener("input", function () {
+    var n = limpiar(tel.value);
+    err.textContent = "";
+    prev.textContent = n ? BASE + n : "";
+  });
+
+  function abrir() {
+    var n = limpiar(tel.value);
+    if (n.length < 8 || n.length > 15) {
+      err.textContent = "El número debe tener entre 8 y 15 dígitos, con código de país.";
+      tel.focus();
+      return;
+    }
+    window.location.href = BASE + n;
+  }
+
+  document.getElementById("ok").addEventListener("click", abrir);
+  tel.addEventListener("keydown", function (e) { if (e.key === "Enter") abrir(); });
+</script>
+</body>
+</html>
